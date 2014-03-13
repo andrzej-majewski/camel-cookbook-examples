@@ -82,17 +82,6 @@
   </properties>
 
   <modules>
-    <module>camel-cookbook-structuring-routes</module>
-    <module>camel-cookbook-routing</module>
-    <module>camel-cookbook-extend</module>
-    <module>camel-cookbook-transformation</module>
-    <module>camel-cookbook-split-join</module>
-    <module>camel-cookbook-parallel-processing</module>
-    <module>camel-cookbook-error</module>
-    <module>camel-cookbook-transactions</module>
-    <module>camel-cookbook-testing</module>
-    <module>camel-cookbook-monitoring</module>
-    <module>camel-cookbook-security</module>
     <module>camel-cookbook-web-services</module>
   </modules>
 
