@@ -13,9 +13,7 @@
   <import resource="cxf-service.xml" />
 
   <bean id="loggingFeature" class="org.apache.cxf.feature.LoggingFeature" />
-
-  <bean id="clientRouteBuilder" class="org.camelcookbook.ws.client.ClientRouteBuilder"/>
- 
+  
   <bean id="paymentServiceImpl" class="org.camelcookbook.ws.fault.PaymentServiceImpl" />
 
   <bean id="inputData" class="org.camelcookbook.ws.client.InputDataset">
@@ -29,12 +27,21 @@
   </bean>
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
-    <routeBuilder ref="clientRouteBuilder" />
-
+    
     <route id="inputData">
       <from uri="dataset:inputData" />
       <to uri="seda:start" />
     </route>
+    <!-- Route under tests -->
+    <route id="wsClient">
+      <from uri="seda:start?concurrentConsumers=4" />
+      <log loggingLevel="INFO" message="${body.getValueTest()}" />
+          
+     <!-- <to uri="backgroundThreadAsyncProcessor" />
+       <to uri="paymentService" />
+   -->    <to uri="backgroundTemplateProcessor" />
+     </route>
+      
     <route id="testResponse">
       <from
         uri="cxf:http://localhost:60090/paymentService?serviceClass=org.camelcookbook.ws.payment_service.Payment&amp;dataFormat=POJO" />

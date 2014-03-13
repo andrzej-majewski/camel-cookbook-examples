@@ -17,21 +17,36 @@
 
 package org.camelcookbook.ws.client;
 
+import org.apache.camel.EndpointInject;
+import org.apache.camel.builder.AdviceWithRouteBuilder;
+import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class ClientSpringTest extends CamelSpringTestSupport {
+
+  @EndpointInject(uri = "mock:results")
+  protected MockEndpoint results;
+  
+  public boolean isUseAdviceWith() {
+    return false;
+  }
+
+  @Override
+  protected AbstractApplicationContext createApplicationContext() {
+
+    return new ClassPathXmlApplicationContext("test-client-context.xml");
+  }
+
+  @Test
+  public void testClientSpring1() throws Exception {
     
-    @Override
-    protected AbstractApplicationContext createApplicationContext() {
-
-        return new ClassPathXmlApplicationContext("test-client-context.xml");
-    }
-
-    @Test
-    public void testClientSpring1() throws InterruptedException {
-      Thread.sleep(5000);
-    }
+    results.expectedMessageCount(40);
+    results.setResultWaitTime(20000);
+    results.assertIsSatisfied();
+    
+    //Thread.sleep(5000);
+  }
 }
