@@ -35,6 +35,7 @@
             <xsd:element name="from" type="xsd:string"/>
             <xsd:element name="to" type="xsd:string"/>
             <xsd:element name="amount" type="xsd:string"/>
+            <xsd:element name="valueTest" type="xsd:int"/>
           </xsd:sequence>
         </xsd:complexType>
       </xsd:element>

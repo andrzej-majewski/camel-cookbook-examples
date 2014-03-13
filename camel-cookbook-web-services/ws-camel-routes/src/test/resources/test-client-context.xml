@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:camel="http://camel.apache.org/schema/spring"
+  xmlns:cxf="http://camel.apache.org/schema/cxf" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+       ">
+  
+  <import resource="cxf-service.xml" />
+
+  <bean id="loggingFeature" class="org.apache.cxf.feature.LoggingFeature" />
+
+  <bean id="clientRouteBuilder" class="org.camelcookbook.ws.client.ClientRouteBuilder"/>
+ 
+  <bean id="paymentServiceImpl" class="org.camelcookbook.ws.fault.PaymentServiceImpl" />
+
+  <bean id="inputData" class="org.camelcookbook.ws.client.InputDataset">
+    <property name="size" value="40" />
+  </bean>
+
+  <bean id="backgroundThreadAsyncProcessor" class="org.camelcookbook.ws.client.BackgroundThreadAsyncProcessor">
+    <property name="paymentService" ref="paymentService" />
+  </bean>
+  <bean id="backgroundTemplateProcessor" class="org.camelcookbook.ws.client.BackgroundTemplateProcessor">
+  </bean>
+
+  <camelContext xmlns="http://camel.apache.org/schema/spring">
+    <routeBuilder ref="clientRouteBuilder" />
+
+    <route id="inputData">
+      <from uri="dataset:inputData" />
+      <to uri="seda:start" />
+    </route>
+    <route id="testResponse">
+      <from
+        uri="cxf:http://localhost:60090/paymentService?serviceClass=org.camelcookbook.ws.payment_service.Payment&amp;dataFormat=POJO" />
+      <transform>
+        <simple>${in.body[0]}</simple>
+      </transform>
+
+      <choice>
+        <when>
+          <simple>${body.getValueTest()} in 1,3,5,7,9,11,13,15,17,19</simple>
+          <delay>
+            <constant>2000</constant>
+          </delay>
+          <log loggingLevel="INFO" message="delayed message ${body.getValueTest()}" />
+          
+        </when>
+        <otherwise>
+          <log loggingLevel="INFO" message="no delay message ${body.getValueTest()}" />
+         <delay>
+            <constant>500</constant>
+          </delay>
+          
+        </otherwise>
+      </choice>
+      <bean ref="paymentServiceImpl"/>
+    </route>
+    
+  </camelContext>
+
+</beans>

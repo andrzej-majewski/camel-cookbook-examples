@@ -18,31 +18,17 @@
 package org.camelcookbook.ws.client;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.camelcookbook.ws.payment_service.Payment;
 
 public class ClientRouteBuilder extends RouteBuilder {
-    private int port1;
-
-    public ClientRouteBuilder() {
-    }
-
-    public ClientRouteBuilder(int port1) {
-        this.port1 = port1;
-    }
-
-    public void setPort1(int port1) {
-        this.port1 = port1;
-    }
-
+        
     @Override
     public void configure() throws Exception {
-        final String cxfUri =
-            String.format("cxf:http://localhost:%d/paymentService?serviceClass=%s",
-                port1, Payment.class.getName());
-
-        from("direct:start")
-                .id("wsClient")
-            .log("${body}")
-            .to(cxfUri + "&defaultOperationName=transferFunds");
+              
+        from("seda:start?concurrentConsumers=4").id("wsClient")
+        .log("${body.getValueTest()}")
+//        .processRef("backgroundThreadAsyncProcessor");
+        .processRef("backgroundTemplateProcessor");
+        //.to("direct:processInOut");
+      
     }
 }
